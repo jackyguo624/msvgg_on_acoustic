@@ -1,0 +1,1 @@
+This repo is supposed to repeat the work of "Ensembles of Multi-scale VGG Acoustic Models" from InterSpeech2017
