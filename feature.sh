@@ -1,12 +1,14 @@
-mfccdir=mfcc40_23
+mfccdir=mfcc40_23/$1
 nj=20
-wav=data/train/wav.scp
+wav=data/$1/wav.scp
 line_total=`wc -l $wav | awk '{print $1}'`
 echo $line_total
 chunk_size=$(( $line_total / $nj))
 
 current_row=1
 i=1
+mkdir -p $mfccdir/wav
+mkdir -p $mfccdir/feats
 while [ $current_row -lt $line_total ]; do
     last_row=$(( $current_row + $chunk_size - 1 ))
     echo $current_row, $last_row
@@ -19,7 +21,7 @@ while [ $current_row -lt $line_total ]; do
     i=$(( $i+1 ))
 done
 
-<<COMMENT1
+
 for(( i=1; i<=$nj; i++))
 do
     echo "Processing wav.$i.scp"
@@ -31,4 +33,3 @@ do
     splice-feats --left-context=11 --right-context=11  \
 		 ark:- ark:$mfccdir/feats/expand_feats.$i.ark
 done
-COMMENT1

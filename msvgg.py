@@ -48,7 +48,7 @@ class MSVGG(nn.Module):
 
 def make_layers(cfg, out_cfg, kernel_size, batch_norm=False):
     layers = []
-    in_channels = 1
+    in_channels = 3
     for v, output in zip(cfg, out_cfg):
         if v[0] == 'M':
             layers += [nn.MaxPool2d(kernel_size=(v[1], v[2]), stride=(v[1], v[2]))]
@@ -182,7 +182,8 @@ def vgg77(**kwargs):
     return model
 
 if __name__ == '__main__':
-    a = Variable(FloatTensor(1,1,40,23), requires_grad=True)
+    a = Variable(FloatTensor(2,3,40,23), requires_grad=True)
+    print FloatTensor(2,3,40,23).size()
     myvgg22 = vgg22()
     myvgg22.forward(a)
 
