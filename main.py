@@ -16,11 +16,11 @@ net = vgg22()
 net = torch.nn.DataParallel(net,device_ids=device_ids)
 net.cuda()
 
-
-f_train='/home/jiaqi/github/msvgg_on_acoustic/mfcc40_23/train_small/feats/expand_feats.{0:d}.ark'
-ali_train='/home/jiaqi/github/msvgg_on_acoustic/ali/ali.ark'
-f_dev='/home/jiaqi/github/msvgg_on_acoustic/mfcc40_23/dev_small/feats/expand_feats.{0:d}.ark'
-ali_dev='/home/jiaqi/github/msvgg_on_acoustic/dev_ali/ali.ark'
+base = '/home/slhome/jqg01/work-home/workspace/pytorch/msvgg_on_acoustic'
+f_train = base+'/mfcc40_23/train/feats/expand_feats.{0:d}.ark'
+ali_train = base+'/ali/ali.ark'
+f_dev = base+'/mfcc40_23/dev_small/feats/expand_feats.{0:d}.ark'
+ali_dev = base + '/dev_ali/ali.ark'
 
 
 change_lr=False

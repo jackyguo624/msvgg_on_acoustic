@@ -1,4 +1,4 @@
-for i in train_small dev_small; #train dev test;
+for i in train dev test;
 do
     ./feature.sh $i
 done
