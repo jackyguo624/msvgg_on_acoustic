@@ -21,6 +21,7 @@ class MSVGG(nn.Module):
             first_linear,
             nn.Linear(2048, 2048),
             nn.Linear(2048, 2048),
+            nn.Linear(2048, 2048),
             nn.Linear(2048, num_class)
         )
         self._initialize_weights()
