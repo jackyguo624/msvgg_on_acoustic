@@ -36,12 +36,12 @@ class Dataloader(object):
         a = list()
         while i <= self.batch_size:
             if self.qsize.value > 0:
-#                self.lock.acquire()
+                #self.lock.acquire()
                 tt = self.data_queue.get()
                 assert(tt is not None)
                 a.append(tt)
                 self.qsize.value -= 1
-#                self.lock.release()
+                #self.lock.release()
                 i = i + 1
             elif self.no_ext_data.value == 1:
                 i_list, l_list = zip(*a)
@@ -50,7 +50,7 @@ class Dataloader(object):
                 warning('Fetch nothing queue size {} sleep'.format(self.qsize.value))
                 time.sleep(5)
                 continue
-        warning('Get batch queue size {}'.format(self.qsize.value))
+        #warning('Get batch queue size {}'.format(self.qsize.value))
         i_list, l_list = zip(*a)
         return torch.FloatTensor(i_list), torch.LongTensor(l_list)
 
@@ -74,7 +74,7 @@ class Dataloader(object):
 
             warning("Read {} {} feats".format(filename,i))
             orig = {k: m for k, m in kaldi_io.read_mat_ark(filename)}
-#            lock.acquire()
+            #lock.acquire()
             count = 0
             for key in orig.keys():
                 feature_mat = orig[key].tolist()
@@ -88,6 +88,6 @@ class Dataloader(object):
             i = i + 1
             qsize.value += count
             warning('after adding. queue size {}'.format(qsize.value))
-#            lock.release()
+            #lock.release()
             filename = self.feature.format(i) # '/home/jiaqi/OKR/ensembleVGG/mfcc40_23/feats/expand_feats.{0:d}.ark'.format(i)
         no_ext_data.value = 1

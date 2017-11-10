@@ -29,7 +29,6 @@ do
 		       --low-freq=20 --high-freq=-400 --use-energy=false \
 		       --verbose=2 scp,p:$mfccdir/wav/wav.$i.scp  ark:- |  \
     add-deltas ark:- ark:- | \
-    copy-feats ark:- ark:- | \
     splice-feats --left-context=11 --right-context=11  \
 		 ark:- ark:$mfccdir/feats/expand_feats.$i.ark
 done

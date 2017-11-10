@@ -68,10 +68,10 @@ out_cfg = [64, 64, -1,
            512, 512, 512, -1]
 
 cfg = {
-    'vgg22': [('C', 1, 0), ('C', 0, 0), ('M', 2, 1),
-              ('C', 1, 0), ('C', 1, 0), ('M', 2, 1),
-              ('C', 1, 0), ('C', 0, 0), ('C', 0, 0), ('M', 2, 2),
-              ('C', 1, 0), ('C', 0, 0), ('C', 0, 0), ('M', 2, 1)],
+    'vgg22': [('C', 0, 1), ('C', 0, 0), ('M', 1, 2),
+              ('C', 0, 1), ('C', 0, 1), ('M', 1, 2),
+              ('C', 0, 1), ('C', 0, 0), ('C', 0, 0), ('M', 2, 2),
+              ('C', 0, 1), ('C', 0, 0), ('C', 0, 0), ('M', 1, 2)],
 
     'vgg23': [('C', 1, 0), ('C', 0, 0), ('M', 2, 1),
               ('C', 1, 0), ('C', 1, 0), ('M', 2, 1),
@@ -183,8 +183,8 @@ def vgg77(**kwargs):
     return model
 
 if __name__ == '__main__':
-    a = Variable(FloatTensor(2,3,40,23), requires_grad=True)
-    print FloatTensor(2,3,40,23).size()
+    a = Variable(FloatTensor(2,3,23,40), requires_grad=True)
+    print FloatTensor(2,3,23,40).size()
     myvgg22 = vgg22()
     myvgg22.forward(a)
 

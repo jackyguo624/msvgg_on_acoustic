@@ -1,25 +1,26 @@
 from dataloader import Dataloader
-from msvgg import vgg22,vgg33
+from msvgg import vgg22,vgg33,vgg44
 import torch
 import argparse
 from torch.autograd import Variable
 from gpuselect import gpu_select
 import modulesave
+import os.path
 
-batch_size=256
+batch_size=128
 
 
-mdl_path='./best_module.pt'
+mdl_path='./best_module22.pt'
 device_ids = gpu_select(2)
 first_device=device_ids[0]
 net = vgg22()
 net = torch.nn.DataParallel(net,device_ids=device_ids)
-net.cuda()
+net.cuda(first_device)
 
 base = '/home/slhome/jqg01/work-home/workspace/pytorch/msvgg_on_acoustic'
 f_train = base+'/mfcc40_23/train/feats/expand_feats.{0:d}.ark'
 ali_train = base+'/ali/ali.ark'
-f_dev = base+'/mfcc40_23/dev_small/feats/expand_feats.{0:d}.ark'
+f_dev = base+'/mfcc40_23/dev/feats/expand_feats.{0:d}.ark'
 ali_dev = base + '/dev_ali/ali.ark'
 
 
@@ -33,13 +34,13 @@ criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.SGD(net.parameters(),lr=lr,momentum=0.9,weight_decay=1e-4)
 
 running_loss = 0.0
-for epoch in range(10):
+for epoch in range(50):
 
     dl = Dataloader(feature=f_train,
-                ali=ali_train,ext_data_n=2,batch_size=batch_size)
+                ali=ali_train,ext_data_n=20,batch_size=batch_size)
 
     devloader = Dataloader(feature=f_dev,
-                           ali=ali_dev,ext_data_n=2,batch_size=batch_size)
+                           ali=ali_dev,ext_data_n=20,batch_size=batch_size)
     
     '''check if need to change learning rate'''
     for param_group in optimizer.param_groups:
@@ -57,23 +58,25 @@ for epoch in range(10):
     total = 0.0
     running_loss = 0.0
 
-    
-    for i, data in enumerate(dl,0):
+    for i, data in enumerate(dl, 0):
         inputs, labels = data
-        i_tensor = inputs.view(-1,3,40,23)
+        bs, datadim = inputs.size()
+        inputs = inputs.view(bs, 3*23, -1)
+        i_tensor = torch.cat((inputs[:,::3],inputs[:,1::3],inputs[:,2::3])
+                             ,dim=1).view(bs,3,23,-1)
+
+        
         l_tensor = labels
-        (f,l)=(Variable(i_tensor.cuda(first_device)),
+        (f, l)=(Variable(i_tensor.cuda(first_device)), 
                Variable(l_tensor.cuda(first_device)))
         optimizer.zero_grad()
-        
         outputs = net(f)
-        loss = criterion(outputs,l)
+        loss = criterion(outputs, l)
         loss.backward()
         optimizer.step()
         
         running_loss += loss.data[0]
-        print running_loss, 'loss'
-        if i % 20 == 19:
+        if i % 2000 == 1999:
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 2000))
             running_loss = 0.0
@@ -82,8 +85,12 @@ for epoch in range(10):
     net.eval()
     for j, data in enumerate(devloader,0):
         inputs, labels = data
-        print inputs.size(), labels.size()
-        i_tensor=inputs.view(-1,3,40,23)
+        bs, datadim = inputs.size()
+        inputs = inputs.view(bs, 3*23, -1)
+        i_tensor = torch.cat((inputs[:,::3],inputs[:,1::3],inputs[:,2::3])
+                             ,dim=1).view(bs,3,23,-1)
+
+
         l_tensor=labels
         (inputs_var,labels_var)=(Variable(i_tensor.cuda(first_device)),
                Variable(l_tensor.cuda(first_device)))
